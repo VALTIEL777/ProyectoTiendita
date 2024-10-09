@@ -52,5 +52,5 @@ class userController {
     }
   }
 }
-
+//modulos exportados
 module.exports = userController;
