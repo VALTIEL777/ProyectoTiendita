@@ -15,11 +15,8 @@ const createSaleDetail = async (saleId, productName, quantity, price) => {
     return result.rows[0];
 };
 
-// Eliminar un detalle de venta por ID
-const deleteSaleDetail = async (id) => {
-    await pool.query('DELETE FROM sale_details WHERE id = $1', [id]);
-};
 
+//agregar modulos exportados
 module.exports = { getSaleDetailsBySaleId, createSaleDetail, deleteSaleDetail };
 
 
