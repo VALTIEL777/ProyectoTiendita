@@ -60,7 +60,7 @@ const updateSale = async (req, res) => {
 // Eliminar una venta
 const deleteSale = async (req, res) => {
     try {
-        await salesModel.deleteSale(req.params.id);
+        await saleModel.deleteSale(req.params.id);
         res.status(204).json();
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar la venta' });
