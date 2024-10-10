@@ -4,7 +4,7 @@ const saleDetailsModel = require('../models/saleDetailsModel');
 // Obtener todas las ventas
 const getAllSales = async (req, res) => {
     try {
-        const sales = await salesModel.getSales();
+        const sales = await saleModel.getSales();
         res.status(200).json(sales);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener ventas' });
