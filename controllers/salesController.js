@@ -14,7 +14,7 @@ const getAllSales = async (req, res) => {
 // Obtener una venta por ID
 const getSale = async (req, res) => {
     try {
-        const sale = await salesModel.getSaleById(req.params.id);
+        const sale = await saleModel.getSaleById(req.params.id);
         if (!sale) {
             return res.status(404).json({ error: 'Venta no encontrada' });
         }
@@ -47,7 +47,7 @@ const createSale = async (req, res) => {
 const updateSale = async (req, res) => {
     try {
         const { total } = req.body;
-        const updatedSale = await salesModel.updateSale(req.params.id, total);
+        const updatedSale = await saleModel.updateSale(req.params.id, total);
         if (!updatedSale) {
             return res.status(404).json({ error: 'Venta no encontrada' });
         }

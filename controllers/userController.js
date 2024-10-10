@@ -1,10 +1,30 @@
 const User = require('../models/userModel');
 
-class userController {
+class UserController {
+
   static async getAllUsers(req, res) {
     try {
       const users = await User.findAll();
       res.json(users);
+    }
+    catch (error) {
+      res.status(500).json({ error: error.message });
+
+    }
+  }
+
+  static async create(data) {
+    const { name, email } = data;
+    const result = await pool.query('INSERT INTO users (nombre, email) VALUES ($1, $2) RETURNING *'
+    [name, email]
+    );
+  }
+
+  static async createUseradd(req, res) {
+    try {
+      const { name, email } = req.body;
+      const user = await User.create({ name, email });
+      res.status(201).json(user);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -14,18 +34,9 @@ class userController {
     try {
       const user = await User.findById(req.params.id);
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  static async createUser(req, res) {
-    try {
-      const user = await User.create(req.body);
-      res.status(201).json(user);
+      return res.json(user);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -51,6 +62,9 @@ class userController {
       res.status(500).json({ error: error.message });
     }
   }
+
 }
-//modulos exportados
-module.exports = userController;
+
+
+
+module.exports = UserController;

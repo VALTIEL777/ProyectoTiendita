@@ -1,99 +1,155 @@
-const product = require('../models/productModel');
+// Importamos el modelo de productos y la biblioteca ExcelJS para manipular archivos Excel
+const productModel = require('../models/productModel');
+const fs = require('fs');
 
-class ProductController {
-    
-    // Método para obtener todos los productos
-    static async getAllProducts(req, res) {
-        try {
-            // Busca todos los productos en la base de datos
-            const products = await Product.findAll();
-            // Responde con los productos en formato JSON
-            res.json(products);
-        } catch (e) {
-            // Manejo de errores, responde con un error 500
-            res.status(500).json({ error: e.message });
-        }
+// Obtener todos los productos
+const getAllProducts = async (req, res) => {
+    try {
+        // Llamamos al modelo para obtener todos los productos
+        const products = await productModel.getAllProducts();
+        // Enviamos la lista de productos en formato JSON
+        res.json(products);
+    } catch (err) {
+
+        res.status(500).json({ message: err.message });
     }
+};
 
-    static async getProdById(req, res)
-    {
-        try{
-            const user = await Product.findById(req.params.id);
-            if(!user)
-            {
-                return res.status(404).json({message:"User not found"});
-            }
-            return res.json(user);
-        }catch(error)
-        {
-            res.status(500).json({error: error.message});
+// Obtener un producto por su ID
+const getProductById = async (req, res) => {
+    try {
+        // Llamamos al modelo para obtener un producto por su ID
+        const product = await productModel.getProductById(req.params.id);
+        if (product) {
+            // Si el producto existe, lo enviamos en formato JSON
+            res.json(product);
+        } else {
+            // Si el producto no existe, devolvemos un mensaje de error con código 404
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
+    } catch (err) {
+        // En caso de error, devolvemos un mensaje de error con código 500
+        res.status(500).json({ message: err.message });
     }
+};
 
-    // Método para crear un nuevo producto
-    static async createProduct(req, res) {
-        try {
-            // Crea un nuevo producto con los datos enviados en el cuerpo de la solicitud
-            const product = await Product.create(req.body);
-            // Responde con el producto creado y un código 201 (creado)
-            res.status(201).json(product);
-        } catch (e) {
-            // Manejo de errores, responde con un error 500
-            res.status(500).json({ error: e.message });
+// Crear un nuevo producto
+const createProduct = async (req, res) => {
+    try {
+        // Llamamos al modelo para crear un nuevo producto con los datos del cuerpo de la solicitud
+        const newProduct = await productModel.createProduct(req.body);
+        // Si el producto se crea con éxito, devolvemos el nuevo producto con código 201
+        res.status(201).json(newProduct);
+    } catch (err) {
+        // En caso de error, devolvemos un mensaje de error con código 500
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Actualizar un producto existente
+const updateProduct = async (req, res) => {
+    try {
+        // Llamamos al modelo para actualizar el producto con el ID y los nuevos datos del cuerpo de la solicitud
+        const updatedProduct = await productModel.updateProduct(req.params.id, req.body);
+        if (updatedProduct) {
+            // Si el producto se actualiza correctamente, lo enviamos en formato JSON
+            res.json(updatedProduct);
+        } else {
+            // Si el producto no se encuentra, devolvemos un mensaje de error con código 404
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
+    } catch (err) {
+        // En caso de error, devolvemos un mensaje de error con código 500
+        res.status(500).json({ message: err.message });
     }
+};
 
-    // Método para actualizar un producto existente
-    static async updateProduct(req, res) {
-        try {
-            // Actualiza el producto con el id pasado como parámetro y los datos del cuerpo
-            const product = await Product.update(req.params.id, req.body);
-            // Si no se encuentra el producto, responde con un 404
-            if (!product) {
-                return res.status(404).json({ message: "Product not found!" });
-            }
-            // Responde con el producto actualizado
-            return res.json(product);
-        } catch (e) {
-            // Manejo de errores, responde con un error 500
-            res.status(500).json({ error: e.message });
+// Eliminar un producto por su ID
+const deleteProduct = async (req, res) => {
+    try {
+        // Llamamos al modelo para eliminar el producto con el ID proporcionado
+        const deletedProduct = await productModel.deleteProduct(req.params.id);
+        if (deletedProduct) {
+            // Si el producto se elimina correctamente, enviamos un mensaje de confirmación
+            res.json({ message: 'Producto eliminado' });
+        } else {
+            // Si el producto no se encuentra, devolvemos un mensaje de error con código 404
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
+    } catch (err) {
+        // En caso de error, devolvemos un mensaje de error con código 500
+        res.status(500).json({ message: err.message });
     }
+};
 
-    // Método para eliminar un producto
-    static async deleteProduct(req, res) {
-        try {
-            // Elimina el producto por id
-            const product = await Product.delete(req.params.id);
-            // Si no se encuentra el producto, responde con un 404
-            if (!product) {
-                return res.status(404).json({ message: "Product not found!" });
-            }
-            // Responde con un mensaje de éxito
-            return res.json({ message: "Product deleted!" });
-        } catch (e) {
-            // Manejo de errores, responde con un error 500
-            res.status(500).json({ error: e.message });
-        }
+// Buscar productos por una consulta en todos los campos
+const searchProducts = async (req, res) => {
+    try {
+        // Llamamos al modelo para buscar productos basados en una consulta
+        const products = await productModel.searchProducts(req.params.query);
+        // Enviamos los productos encontrados en formato JSON
+        res.json(products);
+    } catch (err) {
+        // En caso de error, devolvemos un mensaje de error con código 500
+        res.status(500).json({ message: err.message });
     }
+};
 
-    // Método para buscar productos por un término de búsqueda
-    static async searchProduct(req, res) {
-        try {
-            // Busca productos por un término (parámetro de la URL)
-            const product = await Product.search(req.params.term);
-            // Si no se encuentran productos, responde con un 404
-            if (!product) {
-                return res.status(404).json({ message: "No products found!" });
-            }
-            // Responde con los productos encontrados
-            return res.json(product);
-        } catch (e) {
-            // Manejo de errores, responde con un error 500
-            res.status(500).json({ error: e.message });
-        }
+// Exportar productos a un archivo Excel
+const exportProductsToExcel = async (req, res) => {
+    try {
+        // Obtener todos los productos para exportar
+        const products = await productModel.getAllProducts();
+
+        // Crear un nuevo libro de Excel
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Productos');
+
+        // Definir las columnas
+        worksheet.columns = [
+            { header: 'ID', key: 'id', width: 10 },
+            { header: 'Nombre', key: 'name', width: 30 },
+            { header: 'Descripción', key: 'description', width: 30 },
+            { header: 'Precio', key: 'price', width: 10 },
+            { header: 'Stock', key: 'stock', width: 10 },
+        ];
+
+        // Agregar filas con los productos
+        products.forEach(product => {
+            worksheet.addRow(product);
+        });
+
+        // Definir la ruta para guardar el archivo Excel temporalmente
+        const filePath = './productos.xlsx';
+
+        // Guardar el archivo Excel
+        await workbook.xlsx.writeFile(filePath);
+
+        // Configurar las cabeceras de la respuesta para la descarga del archivo
+        res.setHeader('Content-Disposition', 'attachment; filename=productos.xlsx');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        // Crear un stream del archivo y enviarlo como respuesta
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
+
+        // Borrar el archivo temporal después de enviarlo
+        fileStream.on('end', () => {
+            fs.unlinkSync(filePath);
+        });
+    } catch (err) {
+        // En caso de error, devolvemos un mensaje de error con código 500
+        res.status(500).json({ message: err.message });
     }
-}
+};
 
-// Exporta el controlador para que pueda ser utilizado en las rutas de la aplicación
-module.exports = ProductController;
+// Exportamos todas las funciones del controlador para su uso en rutas
+module.exports = {
+    getAllProducts,
+    getProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    searchProducts,
+    exportProductsToExcel,
+};

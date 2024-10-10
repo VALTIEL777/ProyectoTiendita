@@ -1,26 +1,13 @@
+// routes/productRoutes.js
 const express = require('express');
-
-// Importa el controlador de productos que maneja la lógica de negocio
-const ProductController = require('../controllers/productController');
-
-// Crea un enrutador de express
 const router = express.Router();
+const productController = require('../controllers/productController');
 
-// Define las rutas y asigna los métodos del controlador a cada ruta
-// Obtiene todos los productos
-router.get('/products', ProductController.getAllProducts);
-
-// Obtiene los productos segun su id
-router.get('/products', ProductController.getProdById);
-
-// Crea un nuevo producto
-router.post('/products', ProductController.createProduct);
-
-// Actualiza un producto existente por ID
-router.put('/products/:id', ProductController.updateProduct);
-
-// Elimina un producto existente por ID
-router.delete('/products/:id', ProductController.deleteProduct);
-
-// Exporta el enrutador para que pueda ser utilizado en la configuración de la aplicación
+router.get('/products', productController.getAllProducts);
+router.get('/products/:id', productController.getProductById);
+router.post('/products', productController.createProduct);
+router.put('/products/:id', productController.updateProduct);
+router.delete('/products/:id', productController.deleteProduct);
+router.get('/search/:query', productController.searchProducts);
+router.get('/export', productController.exportProductsToExcel);
 module.exports = router;
