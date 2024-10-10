@@ -21,7 +21,7 @@ const deleteSaleDetail = async (id) => {
 };
 
 
-// Obtener todas las ventas
+// Consultar todas las ventas
 const getSales = async () => {
     const { rows } = await pool.query('SELECT * FROM sales ORDER BY date DESC');
     return rows;
